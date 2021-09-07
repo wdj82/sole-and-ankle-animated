@@ -5,15 +5,7 @@ import { WEIGHTS } from '../../constants';
 import { formatPrice, pluralize, isNewShoe } from '../../utils';
 import Spacer from '../Spacer';
 
-const ShoeCard = ({
-  slug,
-  name,
-  imageSrc,
-  price,
-  salePrice,
-  releaseDate,
-  numOfColors,
-}) => {
+const ShoeCard = ({ slug, name, imageSrc, price, salePrice, releaseDate, numOfColors }) => {
   // There are 3 variants possible, based on the props:
   //   - new-release
   //   - on-sale
@@ -35,23 +27,17 @@ const ShoeCard = ({
     <Link href={`/shoe/${slug}`}>
       <Wrapper>
         <ImageWrapper>
-          <Image alt="" src={imageSrc} />
-          {variant === 'on-sale' && <SaleFlag>Sale</SaleFlag>}
-          {variant === 'new-release' && (
-            <NewFlag>Just released!</NewFlag>
-          )}
+          <Image alt='' src={imageSrc} />
         </ImageWrapper>
+        {variant === 'on-sale' && <SaleFlag>Sale</SaleFlag>}
+        {variant === 'new-release' && <NewFlag>Just released!</NewFlag>}
         <Spacer size={12} />
         <Row>
           <Name>{name}</Name>
           <Price
             style={{
-              '--color':
-                variant === 'on-sale'
-                  ? 'var(--color-gray-700)'
-                  : undefined,
-              '--text-decoration':
-                variant === 'on-sale' ? 'line-through' : undefined,
+              '--color': variant === 'on-sale' ? 'var(--color-gray-700)' : undefined,
+              '--text-decoration': variant === 'on-sale' ? 'line-through' : undefined,
             }}
           >
             {formatPrice(price)}
@@ -59,9 +45,7 @@ const ShoeCard = ({
         </Row>
         <Row>
           <ColorInfo>{pluralize('Color', numOfColors)}</ColorInfo>
-          {variant === 'on-sale' ? (
-            <SalePrice>{formatPrice(salePrice)}</SalePrice>
-          ) : undefined}
+          {variant === 'on-sale' ? <SalePrice>{formatPrice(salePrice)}</SalePrice> : undefined}
         </Row>
       </Wrapper>
     </Link>
@@ -73,15 +57,36 @@ const Link = styled.a`
   color: inherit;
 `;
 
-const Wrapper = styled.article``;
-
-const ImageWrapper = styled.div`
+const Wrapper = styled.article`
   position: relative;
 `;
 
-const Image = styled.img`
-  width: 100%;
+const ImageWrapper = styled.div`
   border-radius: 16px 16px 4px 4px;
+
+  /*
+    Image zooms in on hover/focus,
+    remove spillover
+  */
+  overflow: hidden;
+`;
+
+const Image = styled.img`
+  display: block;
+  width: 100%;
+  transform-origin: 50% 75%;
+  transition: transform 600ms, filter 1000ms;
+  will-change: transform;
+  filter: brightness(90%);
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    ${Link}:hover &,
+    ${Link}:focus & {
+      transform: scale(1.1);
+      filter: brightness(100%);
+      transition: transform 200ms, filter 400ms;
+    }
+  }
 `;
 
 const Row = styled.div`
